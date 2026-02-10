@@ -1,0 +1,16 @@
+# 일반
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# 프로젝트 특정 파일들은 각 하위 폴더의 .gitignore에서 관리됩니다
+# expo-app/.gitignore
+# web-app/.gitignore
