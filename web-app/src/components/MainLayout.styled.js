@@ -1,55 +1,64 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: #f8f9fa;
+  height: 100vh;
+  background: ${props => props.theme.background};
 `;
 
 export const Content = styled.main`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-overflow-scrolling: touch;
 `;
 
 export const BottomNav = styled.nav`
-  position: relative;
   display: flex;
-  justify-content: space-around;
   align-items: center;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
-  z-index: 1000;
+  justify-content: space-around;
+  background: ${props => props.theme.headerBg};
+  backdrop-filter: blur(10px);
+  border-top: 1px solid ${props => props.theme.border};
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 16px ${props => props.theme.shadow};
 `;
 
 export const NavItem = styled.button`
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: none;
-  border: none;
+  gap: 4px;
   padding: 8px 16px;
+  border: none;
+  background: transparent;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  flex: 1;
-  max-width: 100px;
+  position: relative;
+  transition: all 0.2s;
+  min-width: 64px;
 
   &:active {
     transform: scale(0.95);
   }
+`;
 
-  ${props => props.$active && `
-    transform: translateY(-2px);
-  `}
+export const NavIcon = styled.div`
+  font-size: 24px;
+  color: ${props => props.$active ? props.theme.primary : props.theme.textTertiary};
+  transition: all 0.2s;
+  
+  svg {
+    display: block;
+  }
+`;
+
+export const NavLabel = styled.span`
+  font-size: 12px;
+  font-weight: ${props => props.$active ? '700' : '500'};
+  color: ${props => props.$active ? props.theme.primary : props.theme.textTertiary};
+  transition: all 0.2s;
 `;
 
 export const ActiveIndicator = styled.div`
@@ -59,46 +68,6 @@ export const ActiveIndicator = styled.div`
   transform: translateX(-50%);
   width: 32px;
   height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   border-radius: 0 0 3px 3px;
-  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  @keyframes slideDown {
-    from {
-      transform: translateX(-50%) translateY(-3px);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-  }
-`;
-
-export const NavIcon = styled.div`
-  font-size: 24px;
-  margin-bottom: 4px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: ${props => props.$active ? '#667eea' : '#9ca3af'};
-  
-  ${props => props.$active && `
-    transform: scale(1.1);
-    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
-  `}
-
-  svg {
-    display: block;
-  }
-`;
-
-export const NavLabel = styled.span`
-  font-size: 11px;
-  font-weight: ${props => props.$active ? '600' : '500'};
-  color: ${props => props.$active ? '#667eea' : '#6b7280'};
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  
-  ${props => props.$active && `
-    transform: scale(1.05);
-  `}
+  background: ${props => props.theme.gradient};
 `;

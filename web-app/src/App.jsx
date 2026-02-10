@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
+import GlobalStyles from './GlobalStyles';
 import MainLayout from './components/MainLayout';
 import HomePage from './pages/HomePage';
 import ListPage from './pages/ListPage';
@@ -24,9 +26,12 @@ function App() {
   };
 
   return (
-    <MainLayout onPageChange={setCurrentPage}>
-      {renderPage()}
-    </MainLayout>
+    <ThemeProvider>
+      <GlobalStyles />
+      <MainLayout onPageChange={setCurrentPage}>
+        {renderPage()}
+      </MainLayout>
+    </ThemeProvider>
   );
 }
 

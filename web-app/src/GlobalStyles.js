@@ -14,10 +14,6 @@ const GlobalStyles = createGlobalStyle`
     line-height: 1.5;
     font-weight: 400;
 
-    color-scheme: light;
-    color: #1f2937;
-    background-color: #f8f9fa;
-
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -30,6 +26,9 @@ const GlobalStyles = createGlobalStyle`
     min-width: 320px;
     height: 100vh;
     overflow: hidden;
+    background: ${props => props.theme.background};
+    color: ${props => props.theme.text};
+    transition: background 0.3s, color 0.3s;
   }
 
   #root {
@@ -52,12 +51,13 @@ const GlobalStyles = createGlobalStyle`
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: ${props => props.theme.textTertiary};
     border-radius: 3px;
+    opacity: 0.5;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: ${props => props.theme.textSecondary};
   }
 `;
 

@@ -1,238 +1,294 @@
-import styled from 'styled-components';
 import { useState } from 'react';
+import styled from 'styled-components';
+import { mockUsers, regions } from '../data/mockData';
+import { Card, Avatar, Badge } from '../components/common/Card.styled';
+import { SearchInput, InputWrapper, InputIcon, Select } from '../components/common/Input.styled';
 
-const HomeContainer = styled.div`
-  padding: 24px 16px;
+const Container = styled.div`
+  padding: 20px 16px;
   max-width: 600px;
   margin: 0 auto;
 `;
 
 const Header = styled.div`
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 `;
 
 const Title = styled.h1`
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: ${props => props.theme.gradient};
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  margin: 0 0 8px 0;
 `;
 
 const Subtitle = styled.p`
-  font-size: 16px;
-  color: #6b7280;
-  margin: 0;
+  font-size: 14px;
+  color: ${props => props.theme.textSecondary};
+  margin: 0 0 20px 0;
 `;
 
-const StatsGrid = styled.div`
+const FilterSection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const FilterGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
 `;
 
-const StatCard = styled.div`
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s, box-shadow 0.2s;
+const FilterLabel = styled.label`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${props => props.theme.textSecondary};
+  margin-bottom: 6px;
+  display: block;
+`;
 
-  &:active {
-    transform: scale(0.98);
+const FilterGroup = styled.div``;
+
+const OnlineIndicator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: ${props => props.theme.inputBg};
+  border-radius: 12px;
+  margin-bottom: 16px;
+`;
+
+const OnlineDot = styled.div`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  animation: pulse 2s infinite;
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
   }
 `;
 
-const StatValue = styled.div`
-  font-size: 28px;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 4px;
-`;
-
-const StatLabel = styled.div`
+const OnlineText = styled.span`
   font-size: 14px;
-  color: #6b7280;
+  color: ${props => props.theme.textSecondary};
+  
+  strong {
+    color: ${props => props.theme.primary};
+    font-weight: 700;
+  }
 `;
 
-const QuickActions = styled.div`
-  margin-bottom: 32px;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 20px;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 16px 0;
-`;
-
-const ActionGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+const UserList = styled.div`
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 `;
 
-const ActionButton = styled.button`
-  background: white;
-  border: none;
-  border-radius: 16px;
-  padding: 20px 12px;
+const UserCard = styled(Card)`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s;
-
-  &:active {
-    transform: scale(0.95);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
-  }
-`;
-
-const ActionIcon = styled.div`
-  font-size: 28px;
-`;
-
-const ActionLabel = styled.div`
-  font-size: 13px;
-  font-weight: 500;
-  color: #374151;
-`;
-
-const RecentSection = styled.div``;
-
-const RecentCard = styled.div`
-  background: white;
-  border-radius: 16px;
+  gap: 14px;
+  align-items: flex-start;
   padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  display: flex;
-  align-items: center;
-  gap: 16px;
 `;
 
-const RecentIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: white;
-  flex-shrink: 0;
-`;
-
-const RecentContent = styled.div`
+const UserInfo = styled.div`
   flex: 1;
   min-width: 0;
 `;
 
-const RecentTitle = styled.div`
-  font-size: 15px;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 4px;
+const UserHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+`;
+
+const UserName = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+  color: ${props => props.theme.text};
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
 
-const RecentTime = styled.div`
+const UserMeta = styled.div`
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+`;
+
+const UserBio = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.textSecondary};
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
+const UserFooter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const LastSeen = styled.span`
+  font-size: 12px;
+  color: ${props => props.theme.textTertiary};
+`;
+
+const ChatButton = styled.button`
+  padding: 8px 20px;
+  border: none;
+  border-radius: 20px;
+  background: ${props => props.theme.gradient};
+  color: white;
   font-size: 13px;
-  color: #9ca3af;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px ${props => props.theme.shadowStrong};
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 60px 20px;
+  color: ${props => props.theme.textSecondary};
+  
+  div:first-child {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
 `;
 
 function HomePage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [ageFilter, setAgeFilter] = useState('all');
+  const [regionFilter, setRegionFilter] = useState('전체');
+  const [genderFilter, setGenderFilter] = useState('all');
+
+  const filteredUsers = mockUsers.filter(user => {
+    const matchSearch = user.nickname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                       user.bio.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchAge = ageFilter === 'all' || 
+                    (ageFilter === '20s' && user.age >= 20 && user.age < 30) ||
+                    (ageFilter === '30s' && user.age >= 30 && user.age < 40);
+    const matchRegion = regionFilter === '전체' || user.region === regionFilter;
+    const matchGender = genderFilter === 'all' || user.gender === genderFilter;
+
+    return matchSearch && matchAge && matchRegion && matchGender;
+  });
+
+  const onlineCount = mockUsers.filter(u => u.online).length;
+
   return (
-    <HomeContainer>
+    <Container>
       <Header>
-        <Title>안녕하세요! 👋</Title>
-        <Subtitle>오늘도 좋은 하루 보내세요</Subtitle>
+        <Title>참여중인 사용자 💕</Title>
+        <Subtitle>마음에 드는 사람에게 대화를 걸어보세요</Subtitle>
+        
+        <OnlineIndicator>
+          <OnlineDot />
+          <OnlineText>
+            현재 <strong>{onlineCount}명</strong>이 온라인입니다
+          </OnlineText>
+        </OnlineIndicator>
+
+        <InputWrapper style={{ marginBottom: '16px' }}>
+          <InputIcon>🔍</InputIcon>
+          <SearchInput
+            type="text"
+            placeholder="닉네임이나 소개글로 검색..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            $hasIcon
+          />
+        </InputWrapper>
       </Header>
 
-      <StatsGrid>
-        <StatCard>
-          <StatValue>24</StatValue>
-          <StatLabel>완료된 작업</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue>12</StatValue>
-          <StatLabel>진행 중</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue>8</StatValue>
-          <StatLabel>대기 중</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue>95%</StatValue>
-          <StatLabel>달성률</StatLabel>
-        </StatCard>
-      </StatsGrid>
+      <FilterSection>
+        <FilterGrid>
+          <FilterGroup>
+            <FilterLabel>나이</FilterLabel>
+            <Select value={ageFilter} onChange={(e) => setAgeFilter(e.target.value)}>
+              <option value="all">전체</option>
+              <option value="20s">20대</option>
+              <option value="30s">30대</option>
+            </Select>
+          </FilterGroup>
 
-      <QuickActions>
-        <SectionTitle>빠른 실행</SectionTitle>
-        <ActionGrid>
-          <ActionButton>
-            <ActionIcon>📝</ActionIcon>
-            <ActionLabel>새 작업</ActionLabel>
-          </ActionButton>
-          <ActionButton>
-            <ActionIcon>📊</ActionIcon>
-            <ActionLabel>통계</ActionLabel>
-          </ActionButton>
-          <ActionButton>
-            <ActionIcon>🔔</ActionIcon>
-            <ActionLabel>알림</ActionLabel>
-          </ActionButton>
-          <ActionButton>
-            <ActionIcon>📁</ActionIcon>
-            <ActionLabel>파일</ActionLabel>
-          </ActionButton>
-          <ActionButton>
-            <ActionIcon>👥</ActionIcon>
-            <ActionLabel>팀</ActionLabel>
-          </ActionButton>
-          <ActionButton>
-            <ActionIcon>⚡</ActionIcon>
-            <ActionLabel>더보기</ActionLabel>
-          </ActionButton>
-        </ActionGrid>
-      </QuickActions>
+          <FilterGroup>
+            <FilterLabel>지역</FilterLabel>
+            <Select value={regionFilter} onChange={(e) => setRegionFilter(e.target.value)}>
+              {regions.map(region => (
+                <option key={region} value={region}>{region}</option>
+              ))}
+            </Select>
+          </FilterGroup>
 
-      <RecentSection>
-        <SectionTitle>최근 활동</SectionTitle>
-        <RecentCard>
-          <RecentIcon>✅</RecentIcon>
-          <RecentContent>
-            <RecentTitle>프로젝트 미팅 완료</RecentTitle>
-            <RecentTime>5분 전</RecentTime>
-          </RecentContent>
-        </RecentCard>
-        <RecentCard>
-          <RecentIcon>📄</RecentIcon>
-          <RecentContent>
-            <RecentTitle>문서 작성 중</RecentTitle>
-            <RecentTime>1시간 전</RecentTime>
-          </RecentContent>
-        </RecentCard>
-        <RecentCard>
-          <RecentIcon>💬</RecentIcon>
-          <RecentContent>
-            <RecentTitle>팀원과 대화</RecentTitle>
-            <RecentTime>2시간 전</RecentTime>
-          </RecentContent>
-        </RecentCard>
-      </RecentSection>
-    </HomeContainer>
+          <FilterGroup>
+            <FilterLabel>성별</FilterLabel>
+            <Select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}>
+              <option value="all">전체</option>
+              <option value="남성">남성</option>
+              <option value="여성">여성</option>
+            </Select>
+          </FilterGroup>
+        </FilterGrid>
+      </FilterSection>
+
+      <UserList>
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map(user => (
+            <UserCard key={user.id} $clickable>
+              <Avatar $size="64px" $online={user.online}>
+                {user.avatar}
+              </Avatar>
+              <UserInfo>
+                <UserHeader>
+                  <UserName>{user.nickname}</UserName>
+                </UserHeader>
+                <UserMeta>
+                  <Badge>{user.age}세</Badge>
+                  <Badge>{user.gender}</Badge>
+                  <Badge>{user.region}</Badge>
+                </UserMeta>
+                <UserBio>{user.bio}</UserBio>
+                <UserFooter>
+                  <LastSeen>{user.lastSeen}</LastSeen>
+                  <ChatButton>대화하기 💬</ChatButton>
+                </UserFooter>
+              </UserInfo>
+            </UserCard>
+          ))
+        ) : (
+          <EmptyState>
+            <div>🔍</div>
+            <div>검색 결과가 없습니다</div>
+          </EmptyState>
+        )}
+      </UserList>
+    </Container>
   );
 }
 

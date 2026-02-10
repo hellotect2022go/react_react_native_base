@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AiFillHome } from 'react-icons/ai';
 import { IoList, IoSettings } from 'react-icons/io5';
-import { MdViewList } from 'react-icons/md';
+import { MdDynamicFeed } from 'react-icons/md';
 import {
   Container,
   Content,
@@ -17,8 +17,8 @@ function MainLayout({ children, onPageChange }) {
 
   const navItems = [
     { id: 'home', label: '홈', icon: AiFillHome },
-    { id: 'list', label: '목록', icon: IoList },
-    { id: 'list2', label: '목록2', icon: MdViewList },
+    { id: 'list', label: '채팅', icon: IoList },
+    { id: 'list2', label: '피드', icon: MdDynamicFeed },
     { id: 'settings', label: '설정', icon: IoSettings },
   ];
 
