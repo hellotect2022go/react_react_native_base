@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { mockUsers, regions } from '../data/mockData';
 import { Card, Avatar, Badge } from '../components/common/Card.styled';
 import { SearchInput, InputWrapper, InputIcon, Select } from '../components/common/Input.styled';
+import { getUsers } from '../services/api.js';
 
 const Container = styled.div`
   padding: 20px 16px;
@@ -186,8 +187,69 @@ function HomePage() {
   const [ageFilter, setAgeFilter] = useState('all');
   const [regionFilter, setRegionFilter] = useState('전체');
   const [genderFilter, setGenderFilter] = useState('all');
+  const [realUsers, setRealUsers] = useState([]); // 실제 DB 사용자
+  const [loading, setLoading] = useState(false);
 
-  const filteredUsers = mockUsers.filter(user => {
+  // 실제 사용자 목록 가져오기
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        console.log('🔄 사용자 목록 요청 중...');
+        const response = await getUsers();
+        console.log('📦 API 응답 전체:', response);
+        
+        // 응답이 실패했으면 스킵
+        if (response.success === false) {
+          console.warn('⚠️ API 호출 실패, 실제 사용자 없음');
+          setRealUsers([]);
+          return;
+        }
+        
+        // API 응답 형태에 따라 처리
+        const users = response.users || response || [];
+        console.log('👥 파싱된 사용자 목록:', users);
+        
+        if (!Array.isArray(users)) {
+          console.error('❌ users가 배열이 아닙니다:', typeof users);
+          setRealUsers([]);
+          return;
+        }
+        
+        // DB 사용자를 HomePage 형태로 변환
+        const formattedUsers = users.map(user => {
+          console.log('👤 사용자 변환:', user);
+          return {
+            id: user.id || user.uid,
+            avatar: user.avatar || user.profileImage || '😊',
+            nickname: user.nickname || '익명',
+            age: user.age || 0,
+            gender: user.gender === 'male' ? '남성' : user.gender === 'female' ? '여성' : '기타',
+            region: user.region || '미정',
+            bio: user.bio || '안녕하세요!',
+            online: true, // DB에서 온라인 상태는 별도 로직 필요
+            lastSeen: '방금 전',
+            isRealUser: true, // 실제 사용자 표시
+          };
+        });
+        
+        console.log('✅ 최종 변환된 사용자:', formattedUsers);
+        setRealUsers(formattedUsers);
+      } catch (error) {
+        console.error('❌ 사용자 목록 로드 실패:', error);
+        setRealUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Mock 사용자와 실제 사용자 합치기 (Mock이 먼저, 실제 사용자가 뒤에)
+  const allUsers = [...mockUsers, ...realUsers];
+
+  const filteredUsers = allUsers.filter(user => {
     const matchSearch = user.nickname.toLowerCase().includes(searchQuery.toLowerCase()) ||
                        user.bio.toLowerCase().includes(searchQuery.toLowerCase());
     const matchAge = ageFilter === 'all' || 
@@ -199,7 +261,7 @@ function HomePage() {
     return matchSearch && matchAge && matchRegion && matchGender;
   });
 
-  const onlineCount = mockUsers.filter(u => u.online).length;
+  const onlineCount = allUsers.filter(u => u.online).length;
 
   return (
     <Container>
@@ -258,15 +320,27 @@ function HomePage() {
       </FilterSection>
 
       <UserList>
+        {loading && realUsers.length === 0 && (
+          <EmptyState>
+            <div>⏳</div>
+            <div>사용자 목록을 불러오는 중...</div>
+          </EmptyState>
+        )}
+        
         {filteredUsers.length > 0 ? (
           filteredUsers.map(user => (
             <UserCard key={user.id} $clickable>
               <Avatar $size="64px" $online={user.online}>
-                {user.avatar}
+                {user.isRealUser && user.avatar && user.avatar.startsWith('http') ? (
+                  <img src={user.avatar} alt={user.nickname} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  user.avatar
+                )}
               </Avatar>
               <UserInfo>
                 <UserHeader>
                   <UserName>{user.nickname}</UserName>
+                  {user.isRealUser && <Badge $variant="primary">NEW</Badge>}
                 </UserHeader>
                 <UserMeta>
                   <Badge>{user.age}세</Badge>
@@ -282,10 +356,12 @@ function HomePage() {
             </UserCard>
           ))
         ) : (
-          <EmptyState>
-            <div>🔍</div>
-            <div>검색 결과가 없습니다</div>
-          </EmptyState>
+          !loading && (
+            <EmptyState>
+              <div>🔍</div>
+              <div>검색 결과가 없습니다</div>
+            </EmptyState>
+          )
         )}
       </UserList>
     </Container>

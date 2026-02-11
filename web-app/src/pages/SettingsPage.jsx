@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Card } from '../components/common/Card.styled';
 
 const Container = styled.div`
@@ -180,6 +181,15 @@ const VersionInfo = styled.div`
 
 function SettingsPage() {
   const { isDark, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+
+  // 로그아웃 처리
+  const handleLogout = async () => {
+    if (window.confirm('정말 로그아웃 하시겠습니까?')) {
+      await logout();
+      window.location.reload();
+    }
+  };
 
   return (
     <Container>
@@ -189,10 +199,13 @@ function SettingsPage() {
       </Header>
 
       <ProfileSection>
-        <ProfileAvatar>👤</ProfileAvatar>
-        <ProfileName>내 프로필</ProfileName>
-        <ProfileBio>안녕하세요! 반가워요 😊</ProfileBio>
-        <EditButton>프로필 수정</EditButton>
+        <ProfileAvatar>{user?.photoURL || user?.avatar || '👤'}</ProfileAvatar>
+        <ProfileName>{user?.displayName || user?.nickname || '내 프로필'}</ProfileName>
+        <ProfileBio>
+          {user?.bio || '안녕하세요!'}
+          {user?.email && <><br />{user.email}</>}
+        </ProfileBio>
+        <EditButton onClick={() => window.location.hash = '#profile-edit'}>프로필 수정</EditButton>
       </ProfileSection>
 
       <Section>
@@ -287,7 +300,7 @@ function SettingsPage() {
 
       <Section>
         <SettingCard>
-          <SettingItem $clickable>
+          <SettingItem $clickable onClick={handleLogout}>
             <SettingLeft>
               <SettingIcon style={{ background: '#EF4444' }}>🚪</SettingIcon>
               <SettingInfo>
