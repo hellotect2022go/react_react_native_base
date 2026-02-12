@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { mockUsers, regions } from '../data/mockData';
 import { Card, Avatar, Badge } from '../components/common/Card.styled';
 import { SearchInput, InputWrapper, InputIcon, Select } from '../components/common/Input.styled';
-import { getUsers } from '../services/api.js';
+import { getUsers, BASE_URL } from '../services/api.js';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const Container = styled.div`
   padding: 20px 16px;
@@ -219,9 +220,33 @@ function HomePage() {
         // DB 사용자를 HomePage 형태로 변환
         const formattedUsers = users.map(user => {
           console.log('👤 사용자 변환:', user);
+          
+          // profile_images 배열에서 is_primary인 이미지 찾기
+          let profileImageUrl = '😊'; // 기본값
+          
+          if (user.profile_images && Array.isArray(user.profile_images)) {
+            const primaryImage = user.profile_images.find(img => img.is_primary === true);
+            if (primaryImage && primaryImage.file && primaryImage.file.file_path) {
+              // API 서버의 기본 URL과 file_path 결합
+              profileImageUrl = `${BASE_URL}/${primaryImage.file.file_path}`;
+              console.log('🖼️ Primary 이미지 찾음:', profileImageUrl);
+            } else {
+              // primary 이미지가 없으면 첫 번째 이미지 사용
+              const firstImage = user.profile_images[0];
+              if (firstImage && firstImage.file && firstImage.file.file_path) {
+                profileImageUrl = `${BASE_URL}/${firstImage.file.file_path}`;
+                console.log('🖼️ 첫 번째 이미지 사용:', profileImageUrl);
+              } else if (user.avatar) {
+                profileImageUrl = user.avatar;
+              }
+            }
+          } else if (user.avatar) {
+            profileImageUrl = user.avatar;
+          }
+          
           return {
             id: user.id || user.uid,
-            avatar: user.avatar || user.profileImage || '😊',
+            avatar: profileImageUrl,
             nickname: user.nickname || '익명',
             age: user.age || 0,
             gender: user.gender === 'male' ? '남성' : user.gender === 'female' ? '여성' : '기타',

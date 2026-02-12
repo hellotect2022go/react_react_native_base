@@ -28,7 +28,7 @@ const GlobalStyles = createGlobalStyle`
     overflow: hidden;
     background: ${props => props.theme.background};
     color: ${props => props.theme.text};
-    transition: background 0.3s, color 0.3s;
+    transition: background 0s, color 0s;
   }
 
   #root {

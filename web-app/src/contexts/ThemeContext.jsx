@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from '../theme';
 
@@ -18,7 +18,7 @@ export const ThemeProvider = ({ children }) => {
     return saved === 'dark';
   });
 
-  const theme = isDark ? darkTheme : lightTheme;
+  const theme = useMemo(() => isDark ? darkTheme : lightTheme, [isDark]);
 
   const toggleTheme = () => {
     setIsDark(prev => {

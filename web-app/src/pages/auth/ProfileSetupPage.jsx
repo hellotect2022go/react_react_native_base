@@ -442,17 +442,18 @@ function ProfileSetupPage() {
       
       console.log('✅ 백엔드 응답:', response);
 
+
       if(response.success) {
         // // 2. 로컬 상태 업데이트 (AuthContext)
-        // await updateUserProfile(user.uid, {
-        //   ...formData,
-        //   profileImage: response.user?.profileImage || formData.profileImage, // 서버에서 받은 이미지 URL 사용
-        //   profileComplete: true,
-        // });
-        // console.log('✅ 프로필 저장 완료!');
+        await updateUserProfile(user.uid, {
+          ...formData,
+          profileImage: response.user?.profileImage || formData.profileImage, // 서버에서 받은 이미지 URL 사용
+          profileComplete: true,
+        });
+        console.log('✅ 프로필 저장 완료!');
         
-        // // 메인 화면으로 이동
-        // window.location.reload();
+        // 메인 화면으로 이동
+        window.location.reload();
       }
       
     } catch (err) {

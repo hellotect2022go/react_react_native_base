@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { regions } from '../data/mockData';
-import { uploadImage } from '../services/api';
+import { uploadImage, updateUserProfile} from '../services/api';
 
 const Container = styled.div`
   height: 100vh;
@@ -452,10 +452,17 @@ function ProfileEditPage() {
     setLoading(true);
 
     try {
-      // TODO: PUT /api/v1/users/profile API 호출
-      // const response = await updateUserProfileAPI(user.uid, formData);
+      // PUT /api/v1/users/profile API 호출
+      const response = await updateUserProfile(user.uid, formData);
       
-      // 로컬 상태 업데이트
+      console.log('📡 서버 응답:', response);
+      
+      // API 호출 실패 체크
+      if (response.success === false) {
+        throw new Error(response.message || '프로필 수정에 실패했습니다.');
+      }
+      
+      // 로컬 상태 업데이트 (AuthContext의 updateUserProfile 사용)
       await updateUserProfile(user.uid, {
         ...formData,
       });

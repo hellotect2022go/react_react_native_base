@@ -111,46 +111,15 @@ export const AuthProvider = ({ children }) => {
         throw new Error('6자리 코드를 입력해주세요.');
       }
 
-      // 익명 고유 ID 생성 (UUID 형태)
-      const generateUUID = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          const r = Math.random() * 16 | 0;
-          const v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      };
-
-      // refreshToken 생성
-      const generateRefreshToken = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-        let token = '';
-        for (let i = 0; i < 120; i++) {
-          token += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return token;
-      };
-
-      const anonymousUid = generateUUID();
-      const refreshToken = generateRefreshToken();
-
       const userData = {
-        uid: anonymousUid,  // UUID 형태의 익명 고유 ID
-        refreshToken: refreshToken,  // 갱신 토큰
+        uid: 'test-user-' + Date.now(),
+        phoneNumber: phoneNumber,
         isNewUser: true,
-        authProvider: 'phone',
-        createdAt: new Date().toISOString(),
-        // 전화번호는 저장하지 않음!
-        // phoneNumber는 백엔드에서 해시화하여 별도 관리
       };
 
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
-      
-      // 전화번호 정보 삭제 (보안)
-      setPhoneNumber('');
-      
       console.log('✅ 인증 완료 (테스트 모드)');
-      console.log('🔐 익명 UID:', anonymousUid);
       
       return userData;
       
@@ -197,8 +166,8 @@ export const AuthProvider = ({ children }) => {
         email: 'test@gmail.com',
         displayName: '테스트 유저',
         photoURL: '👤',
-        authProvider: 'google+phone',
-        // phoneNumber는 저장하지 않음!
+        phoneNumber: user?.phoneNumber || '+821012345678',
+        provider: 'google',
       };
 
       setUser(userData);
@@ -314,6 +283,7 @@ export const AuthProvider = ({ children }) => {
   // Context에 제공할 값
   const value = {
     user,
+    setUser,
     loading,
     phoneNumber,
     sendSMSCode,

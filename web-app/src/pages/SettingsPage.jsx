@@ -135,7 +135,10 @@ const ProfileAvatar = styled.div`
   height: 80px;
   margin: 0 auto 16px;
   border-radius: 50%;
-  background: ${props => props.theme.gradient};
+  // background: ${props => props.theme.gradient};
+   background: ${props => props.$hasImage 
+    ? `url(${props.$imageUrl}) center/cover` 
+    : props.theme.inputBg};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,6 +186,9 @@ function SettingsPage() {
   const { isDark, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
 
+  console.log('👤 사용자 정보:', user);
+
+
   // 로그아웃 처리
   const handleLogout = async () => {
     if (window.confirm('정말 로그아웃 하시겠습니까?')) {
@@ -199,7 +205,12 @@ function SettingsPage() {
       </Header>
 
       <ProfileSection>
-        <ProfileAvatar>{user?.photoURL || user?.avatar || '👤'}</ProfileAvatar>
+        <ProfileAvatar
+          $hasImage={!!user?.profileImage}
+          $imageUrl={user?.profileImage}>
+            {!user?.profileImage && (user?.avatar || '👤')}
+        </ProfileAvatar>
+        
         <ProfileName>{user?.displayName || user?.nickname || '내 프로필'}</ProfileName>
         <ProfileBio>
           {user?.bio || '안녕하세요!'}

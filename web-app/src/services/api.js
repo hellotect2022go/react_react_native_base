@@ -1,6 +1,8 @@
 // API 기본 설정
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8888/api/v1';
 
+export const BASE_URL = 'http://192.168.10.218:8888';
+
 /**
  * 공통 API 요청 함수
  * @param {string} endpoint - API 엔드포인트
@@ -101,14 +103,15 @@ export async function getUserProfile(userId) {
  * @returns {Promise<Object>} - 업데이트된 사용자 정보
  */
 export async function updateUserProfile(userId, profileData) {
-  // TODO: 백엔드 API 연동
-  // return apiRequest(`/users/${userId}`, {
-  //   method: 'PUT',
-  //   body: JSON.stringify(profileData),
-  // });
+  console.log('📝 프로필 업데이트 요청:', profileData);
   
-  console.log('프로필 업데이트:', profileData);
-  return { success: true };
+  return apiRequest(`/users/profile`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      uid: userId,
+      ...profileData,
+    }),
+  });
 }
 
 /**
